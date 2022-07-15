@@ -1,5 +1,5 @@
 <!-- Add a a link to the ticket by replacing 'TCKT-0000' with the number of the ticket. -->
-**Ticket: [TCKT-0000](https://cloverhealth.atlassian.net/browse/TCKT-0000)**
+**Ticket: [TCKT-0000]**
 
 ## What?
 <!-- Required. -->
