@@ -1,0 +1,37 @@
+name: Run unit tests on Integration Sandbox
+on:
+  pull_request:
+    branches:
+      - dev
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/**'
+      - 'force-app/**'
+      - 'manifest/**'
+
+jobs:
+  run-unit-tests-on-int:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Salesforce CLI
+        run: |
+          wget https://developer.salesforce.com/media/salesforce-cli/sfdx-cli/channels/stable/sfdx-cli-v7.72.0-697e9faee2-linux-x64.tar.xz
+          mkdir sfdx-cli
+          tar xJf sfdx-cli-v7.72.0-697e9faee2-linux-x64.tar.xz -C sfdx-cli --strip-components 1
+          ./sfdx-cli/install
+      - name: Checkout source code
+        uses: actions/checkout@v2
+      - name: Set environment variable
+        run: |
+          cat ./.github/workflows/env | grep CONSUMER_KEY= | grep -o '".*"' | sed 's/"//g' > CONSUMER_KEY
+          cat ./.github/workflows/env | grep USERNAME= | grep -o '".*"' | sed 's/"//g' > USERNAME
+      - name: Authenticate Sandbox
+        run: |
+          echo "${SALESFORCE_JWT_SECRET_KEY}" > server.key
+          sfdx force:auth:jwt:grant --jwtkeyfile ./server.key --setalias QA --instanceurl https://login.salesforce.com --clientid $(cat CONSUMER_KEY) --username $(cat USERNAME)
+        env:
+          SALESFORCE_JWT_SECRET_KEY: ${{ secrets.SALESFORCE_JWT_SECRET_KEY }}
+      - name: Run Apex Tests on Target Sandbox
+        run: |
+          sfdx force:source:deploy --wait 180 --checkonly --testlevel RunLocalTests -u QA --manifest manifest/package.xml --verbose
