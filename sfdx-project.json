@@ -1,0 +1,19 @@
+{
+    "packageDirectories": [
+        {
+            "path": "force-app",
+            "default": true,
+            "package": "accounttrigger",
+            "versionName": "Version 3.0",
+            "versionNumber": "3.0.0.NEXT"
+        }
+    ],
+    "namespace": "",
+    "sfdcLoginUrl": "https://login.salesforce.com",
+    "sourceApiVersion": "53.0",
+    "packageAliases": {
+        "accounttrigger": "0Ho6F000000fxhaSAA",
+        "accounttrigger@1.0.0-1": "04t6F00000416EZQAY",
+        "accounttrigger@2.0.0-1": "04t6F00000416EeQAI"
+    }
+}

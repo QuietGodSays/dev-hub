@@ -1,0 +1,205 @@
+<aura:component description="MemberInquiry" controller="MemberInquiryController">
+    <aura:attribute name="recordId" type="String" access="global" />
+    <aura:attribute name="isBenefitInquiryModalOpen" type="boolean" default="false" />
+    <aura:attribute name="isPharmacyInfoActive" type="boolean" default="false" />
+    <aura:attribute name="applicationName" type="String" />
+
+    <aura:handler
+        name="communPrefInquiry"
+        event="c:CommunPreferenceInquiry"
+        action="{!c.handleCommunPreferenceInquiry}"
+    />
+    <aura:handler name="verified" event="c:MemberVerified" action="{!c.handleMemberVerified}" />
+
+    <aura:registerEvent name="closePopup" type="c:CloseStartPopup" />
+
+    <lightning:overlayLibrary aura:id="overlayLib" />
+
+    <lightning:workspaceAPI aura:id="workspace" />
+
+    <lightning:utilityBarAPI aura:id="utilInquiry" />
+
+    <center class="slds-m-top_large">
+        <div class="slds-m-top_x-small">
+            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Choose the inquiry:</h2>
+        </div>
+
+        <div class="slds-grid slds-grid_vertical slds-m-vertical_medium">
+            <div class="slds-container_center slds-m-vertical_x-small slds-col slds-size_8-of-12">
+                <lightning:button
+                    type="button"
+                    name="Benefit inquiry"
+                    label="Benefit Inquiry"
+                    class="stretchButton slds-button slds-button_brand"
+                    onclick="{!c.openBenefitInquiryModal}"
+                />
+
+                <!-- modal popup for Benefit Inquiry -->
+                <aura:if isTrue="{!v.isBenefitInquiryModalOpen}">
+                    <section
+                        role="dialog"
+                        tabindex="-1"
+                        class="slds-modal slds-fade-in-open"
+                        aria-labelledby="benefit-inquiry-modal"
+                        aria-modal="true"
+                        aria-describedby="benefit-inquiry-modal-content"
+                    >
+                        <div class="slds-modal__container" style="min-width: 80%">
+                            <header class="slds-modal__header_empty slds-modal__header">
+                                <lightning:buttonIcon
+                                    iconName="utility:close"
+                                    onclick="{!c.closeBenefitInquiryModal}"
+                                    alternativeText="close"
+                                    variant="bare-inverse"
+                                    class="slds-modal__close"
+                                />
+                            </header>
+                            <div class="slds-modal__content slds-p-around_medium" id="benefit-inquiry-modal-content">
+                                <div class="slds-container_center slds-m-vertical_medium slds-col slds-size_8-of-12">
+                                    <aura:if isTrue="{!v.isPharmacyInfoActive == false}">
+                                        <lightning:button
+                                            type="button"
+                                            name="Pharmacy Information"
+                                            label="Pharmacy Information"
+                                            class="
+                                                stretchButton
+                                                slds-button slds-button_brand
+                                                slds-button-line-height-normal
+                                            "
+                                            onclick="{!c.showPharmacyInfo}"
+                                        />
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.isPharmacyInfoActive}">
+                                        <lightning:button
+                                            type="button"
+                                            name="Formulary Search"
+                                            label="Formulary Search"
+                                            class="stretchButton slds-button slds-button_brand"
+                                            onclick="{!c.formularySearch}"
+                                        />
+                                    </aura:if>
+                                </div>
+                                <div class="slds-container_center slds-m-vertical_medium slds-col slds-size_8-of-12">
+                                    <aura:if isTrue="{!v.isPharmacyInfoActive == false}">
+                                        <lightning:button
+                                            type="button"
+                                            name="Plan Benefit Information"
+                                            label="Plan Benefit Information"
+                                            class="
+                                                stretchButton
+                                                slds-button slds-button_brand
+                                                slds-button-line-height-normal
+                                            "
+                                            onclick="{!c.benefitInquiry}"
+                                        />
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.isPharmacyInfoActive}">
+                                        <lightning:button
+                                            type="button"
+                                            name="Pharmacy Search"
+                                            label="Pharmacy Search"
+                                            class="stretchButton slds-button slds-button_brand"
+                                            onclick="{!c.pharmacySearch}"
+                                        />
+                                    </aura:if>
+                                </div>
+                            </div>
+                            <footer class="slds-modal__footer">
+                                <div class="slds-float_right slds-size_3-of-12">
+                                    <lightning:button
+                                        variant="neutral"
+                                        label="Cancel"
+                                        title="Cancel"
+                                        class="stretchButton"
+                                        onclick="{!c.closeBenefitInquiryModal}"
+                                    />
+                                </div>
+                            </footer>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </aura:if>
+            </div>
+
+            <aura:if isTrue="{!v.applicationName == 'CX Console'}">
+                <div class="slds-container_center slds-m-vertical_x-small slds-col slds-size_8-of-12">
+                    <lightning:button
+                        type="button"
+                        name="Provider Search"
+                        label="Provider Search"
+                        class="stretchButton slds-button slds-button_brand"
+                        onclick="{!c.showProviderSearch}"
+                    />
+                </div>
+            </aura:if>
+
+            <div class="slds-container_center slds-m-vertical_x-small slds-col slds-size_8-of-12">
+                <lightning:button
+                    type="button"
+                    name="Update Communication Preferences"
+                    label="Update Communication Preferences"
+                    class="stretchButton slds-button slds-button_brand slds-button-line-height-normal"
+                    onclick="{!c.updateCommunicationPreferences}"
+                />
+            </div>
+
+            <aura:if isTrue="{!v.applicationName == 'CX Console'}">
+                <div class="slds-container_center slds-m-vertical_x-small slds-col slds-size_8-of-12">
+                    <lightning:button
+                        type="button"
+                        name="Submit Transportation Request"
+                        label="Submit Transportation Request"
+                        class="stretchButton slds-button slds-button_brand"
+                        onclick="{!c.submitTransportationRequest}"
+                    >
+                    </lightning:button>
+                </div>
+            </aura:if>
+
+            <div class="slds-container_center slds-m-vertical_x-small slds-col slds-size_8-of-12">
+                <lightning:button
+                    type="button"
+                    name="Deceased Member"
+                    label="Deceased Member"
+                    class="stretchButton slds-button slds-button_brand"
+                    onclick="{!c.deceasedMember}"
+                >
+                </lightning:button>
+            </div>
+
+            <div class="slds-container_center slds-m-vertical_x-small slds-col slds-size_8-of-12">
+                <lightning:button
+                    type="button"
+                    name="Temporary Consent"
+                    label="Temporary Consent"
+                    class="stretchButton slds-button slds-button_brand"
+                    onclick="{!c.temporaryConsent}"
+                >
+                </lightning:button>
+            </div>
+
+            <div class="slds-container_center slds-m-vertical_x-small slds-col slds-size_8-of-12">
+                <lightning:button
+                    type="button"
+                    name="Verify Another Member"
+                    label="Verify Another Member"
+                    class="stretchButton slds-button slds-button_brand"
+                    onclick="{!c.verifyAnotherMember}"
+                >
+                </lightning:button>
+            </div>
+
+            <!-- COVID19 Vaccine Info -->
+            <div class="slds-container_center slds-m-vertical_x-small slds-col slds-size_8-of-12">
+                <lightning:button
+                    type="button"
+                    name="COVID19 Vaccine Info"
+                    label="COVID19 Vaccine Info"
+                    class="stretchButton slds-button slds-button_brand"
+                    onclick="{!c.covidVaccine}"
+                >
+                </lightning:button>
+            </div>
+        </div>
+    </center>
+</aura:component>
